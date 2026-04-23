@@ -32,3 +32,17 @@ void openInBrowser(const std::string& url) {
 #endif
     system(cmd.c_str());
 }
+
+
+// ===============================
+// Validator
+// ===============================
+
+class Validator {
+public:
+    static bool isValidUrl(const std::string& url) {
+        std::regex pattern("^(http://|https://)[^\\s]+$");
+        return std::regex_match(url, pattern);
+    }
+};
+
