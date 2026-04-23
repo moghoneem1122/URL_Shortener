@@ -111,3 +111,55 @@ public:
     }
 };
 
+
+class Storage {
+private:
+    std::string file = "urls.txt";
+    std::unordered_map<std::string, std::string> s2l;
+    std::unordered_map<std::string, std::string> l2s;
+
+public:
+    Storage() { load(); }
+
+    void load() {
+        std::ifstream f(file);
+        std::string line;
+
+        while (std::getline(f, line)) {
+            size_t pos = line.find('|');
+            if (pos == std::string::npos) continue;
+
+            std::string shortUrl = line.substr(0, pos);
+            std::string longUrl = line.substr(pos + 1);
+
+            s2l[shortUrl] = longUrl;
+            l2s[longUrl] = shortUrl;
+        }
+    }
+
+    void save(const std::string& s, const std::string& l) {
+        s2l[s] = l;
+        l2s[l] = s;
+
+        std::ofstream f(file, std::ios::app);
+        f << s << "|" << l << "\n";
+    }
+
+    bool hasShort(const std::string& s) { return s2l.count(s); }
+    bool hasLong(const std::string& l) { return l2s.count(l); }
+
+    std::string getShort(const std::string& l) { return l2s[l]; }
+
+    std::string getLong(const std::string& s) {
+        return hasShort(s) ? s2l[s] : "";
+    }
+
+  
+    std::vector<std::pair<std::string, std::string>> getAll() {
+        std::vector<std::pair<std::string, std::string>> data;
+        for (auto& it : s2l) {
+            data.push_back(it);
+        }
+        return data;
+    }
+};
