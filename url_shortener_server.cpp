@@ -212,3 +212,81 @@ public:
         return storage.getAll();
     }
 };
+
+
+int main() {
+    Service service;
+
+    while (true) {
+        std::cout << "\n===========================\n";
+        std::cout << " URL SHORTENER CLI SYSTEM\n";
+        std::cout << "===========================\n";
+        std::cout << "1. Shorten URL\n";
+        std::cout << "2. Open Short URL\n";
+        std::cout << "3. Show all URLs\n";
+        std::cout << "4. Exit\n";
+        std::cout << "Choose: ";
+
+        int choice;
+        std::cin >> choice;
+        std::cin.ignore();
+
+        if (choice == 1) {
+            std::string url;
+            std::cout << "Enter long URL: ";
+            std::getline(std::cin, url);
+
+            Result res = service.shorten(url);
+
+            std::cout << "\n--- RESULT ---\n";
+            std::cout << res.message << "\n";
+
+            if (!res.short_url.empty()) {
+                std::cout << "Short URL: " << res.short_url << "\n";
+            }
+        }
+
+        else if (choice == 2) {
+            std::string shortUrl;
+            std::cout << "Enter short URL (/gh/id): ";
+            std::getline(std::cin, shortUrl);
+
+            std::string longUrl = service.resolve(shortUrl);
+
+            std::cout << "\n--- RESULT ---\n";
+
+            if (longUrl.empty()) {
+                std::cout << "URL not found\n";
+            } else {
+                std::cout << "Original URL: " << longUrl << "\n";
+                std::cout << "Opening in browser...\n";
+                openInBrowser(longUrl);
+            }
+        }
+
+        else if (choice == 3) {
+            auto all = service.getAllUrls();
+
+            std::cout << "\n--- ALL SHORTENED URLS ---\n";
+
+            if (all.empty()) {
+                std::cout << "No URLs stored yet\n";
+            } else {
+                for (auto& p : all) {
+                    std::cout << p.first << "  --->  " << p.second << "\n";
+                }
+            }
+        }
+
+        else if (choice == 4) {
+            std::cout << "Bye 👋\n";
+            break;
+        }
+
+        else {
+            std::cout << "Invalid choice\n";
+        }
+    }
+
+    return 0;
+}
