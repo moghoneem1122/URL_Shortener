@@ -163,3 +163,52 @@ public:
         return data;
     }
 };
+ 
+struct Result {
+    std::string message;
+    std::string short_url;
+    bool duplicate;
+};
+
+
+
+class Service {
+private:
+    Storage storage;
+    Generator gen;
+
+public:
+    Result shorten(std::string url) {
+        url = normalize(url);
+
+        if (!Validator::isValidUrl(url)) {
+            return {"Invalid URL format", "", false};
+        }
+
+        if (storage.hasLong(url)) {
+            return {
+                "Duplicate URL detected (already exists)",
+                storage.getShort(url),
+                true
+            };
+        }
+
+        std::string shortUrl = gen.generate(url);
+        storage.save(shortUrl, url);
+
+        return {
+            "Short URL created successfully",
+            shortUrl,
+            false
+        };
+    }
+
+    std::string resolve(const std::string& shortUrl) {
+        return storage.getLong(shortUrl);
+    }
+
+    
+    std::vector<std::pair<std::string, std::string>> getAllUrls() {
+        return storage.getAll();
+    }
+};
